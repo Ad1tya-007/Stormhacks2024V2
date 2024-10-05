@@ -1,14 +1,12 @@
-'use client';
-
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-  LineChart,
-  Line,
-} from 'recharts';
+// import {
+//   XAxis,
+//   YAxis,
+//   CartesianGrid,
+//   Tooltip,
+//   ResponsiveContainer,
+//   LineChart,
+//   Line,
+// } from 'recharts';
 import { Lightbulb, TrendingUp, AlertTriangle } from 'lucide-react';
 
 import {
@@ -20,16 +18,18 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import Sidebar from '@/components/shared/Sidebar';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
-const performanceData = [
-  { date: '2023-09-20', buildTime: 100, successRate: 95 },
-  { date: '2023-09-21', buildTime: 110, successRate: 93 },
-  { date: '2023-09-22', buildTime: 95, successRate: 97 },
-  { date: '2023-09-23', buildTime: 105, successRate: 94 },
-  { date: '2023-09-24', buildTime: 98, successRate: 96 },
-  { date: '2023-09-25', buildTime: 92, successRate: 98 },
-  { date: '2023-09-26', buildTime: 88, successRate: 99 },
-];
+// const performanceData = [
+//   { date: '2023-09-20', buildTime: 100, successRate: 95 },
+//   { date: '2023-09-21', buildTime: 110, successRate: 93 },
+//   { date: '2023-09-22', buildTime: 95, successRate: 97 },
+//   { date: '2023-09-23', buildTime: 105, successRate: 94 },
+//   { date: '2023-09-24', buildTime: 98, successRate: 96 },
+//   { date: '2023-09-25', buildTime: 92, successRate: 98 },
+//   { date: '2023-09-26', buildTime: 88, successRate: 99 },
+// ];
 
 const insights = [
   {
@@ -49,7 +49,15 @@ const insights = [
   },
 ];
 
-export default function Insights() {
+export default async function Insights() {
+  const supabase = createClient();
+
+  const { data } = await supabase.auth.getUser();
+
+  if (!data?.user) {
+    redirect('/auth');
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -69,7 +77,7 @@ export default function Insights() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            {/* <ResponsiveContainer width="100%" height={300}>
               <LineChart data={performanceData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="date" />
@@ -91,7 +99,7 @@ export default function Insights() {
                   name="Success Rate (%)"
                 />
               </LineChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer> */}
           </CardContent>
         </Card>
 

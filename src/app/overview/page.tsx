@@ -1,14 +1,12 @@
-'use client';
-
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from 'recharts';
+// import {
+//   BarChart,
+//   Bar,
+//   XAxis,
+//   YAxis,
+//   CartesianGrid,
+//   Tooltip,
+//   ResponsiveContainer,
+// } from 'recharts';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
 import {
@@ -29,6 +27,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import Sidebar from '@/components/shared/Sidebar';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 const pipelineData = [
   {
@@ -65,7 +65,15 @@ const pipelineData = [
   },
 ];
 
-export default function PipelineOverview() {
+export default async function PipelineOverview() {
+  const supabase = createClient();
+
+  const { data } = await supabase.auth.getUser();
+
+  if (!data?.user) {
+    redirect('/auth');
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
@@ -139,7 +147,7 @@ export default function PipelineOverview() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            <ResponsiveContainer width="100%" height={300}>
+            {/* <ResponsiveContainer width="100%" height={300}>
               <BarChart data={pipelineData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
@@ -159,7 +167,7 @@ export default function PipelineOverview() {
                   name="Error Rate (%)"
                 />
               </BarChart>
-            </ResponsiveContainer>
+            </ResponsiveContainer> */}
           </CardContent>
         </Card>
       </div>

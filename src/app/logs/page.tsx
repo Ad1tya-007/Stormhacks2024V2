@@ -1,5 +1,3 @@
-'use client';
-
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 import {
   Card,
@@ -26,6 +24,8 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import Sidebar from '@/components/shared/Sidebar';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 const logEntries = [
   {
@@ -65,7 +65,15 @@ const logEntries = [
   },
 ];
 
-export default function Logs() {
+export default async function Logs() {
+  const supabase = createClient();
+
+  const { data } = await supabase.auth.getUser();
+
+  if (!data?.user) {
+    redirect('/auth');
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar />
