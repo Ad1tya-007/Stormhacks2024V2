@@ -1,7 +1,4 @@
-'use client';
-
 import React from 'react';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,12 +7,18 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import Link from 'next/link';
-import { Github } from 'lucide-react';
+import GithubButton from '@/components/shared/GithubButton';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function LoginPage() {
-  const handleGitHubLogin = () => {
-    console.log('Initiating GitHub login');
-  };
+export default async function LoginPage() {
+  const supabase = createClient();
+
+  const { data } = await supabase.auth.getUser();
+
+  if (data?.user) {
+    redirect('/dashboard');
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 flex flex-col items-center justify-center p-4">
@@ -29,14 +32,7 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center">
-          <Button
-            onClick={handleGitHubLogin}
-            className="w-full max-w-sm flex items-center justify-center space-x-2 mb-4"
-            variant="outline"
-            size="lg">
-            <Github className="w-5 h-5" />
-            <span>Log in with GitHub</span>
-          </Button>
+          <GithubButton />
 
           <Link href="/" className="text-sm text-gray-500 mt-2 hover:underline">
             Back to Home

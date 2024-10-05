@@ -1,8 +1,4 @@
-'use client';
-
-import React from 'react';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
-
 import {
   Card,
   CardContent,
@@ -27,7 +23,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import { useRouter } from 'next/navigation';
+import Sidebar from '@/components/shared/Sidebar';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
 const logEntries = [
   {
@@ -67,37 +65,18 @@ const logEntries = [
   },
 ];
 
-export default function Logs() {
-  const router = useRouter();
+export default async function Logs() {
+  const supabase = createClient();
+
+  const { data } = await supabase.auth.getUser();
+
+  if (!data?.user) {
+    redirect('/auth');
+  }
+
   return (
     <div className="flex h-screen bg-gray-100">
-      <div className="w-64 bg-white shadow-md">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-gray-800">DevOps Monitor</h1>
-        </div>
-        <nav className="mt-4">
-          <a
-            onClick={() => router.push('/dashboard')}
-            className="block py-2 px-4 text-gray-700  hover:bg-gray-300">
-            Dashboard
-          </a>
-          <a
-            onClick={() => router.push('/overview')}
-            className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            Pipeline Overview
-          </a>
-          <a
-            onClick={() => router.push('/insights')}
-            className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            Insights
-          </a>
-          <a
-            onClick={() => router.push('/logs')}
-            className="block py-2 px-4 text-gray-700 bg-gray-200 hover:bg-gray-200">
-            Logs
-          </a>
-        </nav>
-      </div>
+      <Sidebar />
 
       {/* Main content */}
       <div className="flex-1 p-8 overflow-auto">
