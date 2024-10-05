@@ -49,7 +49,7 @@ export default function HomePage() {
             insights, and actionable recommendations to help you streamline your
             DevOps processes and boost your team&apos;s productivity.
           </p>
-          <Link href="/login" passHref>
+          <Link href="/auth" passHref>
             <Button size="lg" className="text-lg">
               Get Started
             </Button>
