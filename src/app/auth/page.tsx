@@ -8,8 +8,18 @@ import {
 } from '@/components/ui/card';
 import Link from 'next/link';
 import GithubButton from '@/components/shared/GithubButton';
+import { createClient } from '@/utils/supabase/server';
+import { redirect } from 'next/navigation';
 
-export default function LoginPage() {
+export default async function LoginPage() {
+  const supabase = createClient();
+
+  const { data } = await supabase.auth.getUser();
+
+  if (data?.user) {
+    redirect('/dashboard');
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md">

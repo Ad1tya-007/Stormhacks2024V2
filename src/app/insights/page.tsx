@@ -1,6 +1,5 @@
 'use client';
 
-import React from 'react';
 import {
   XAxis,
   YAxis,
@@ -20,8 +19,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
-import { useRouter } from 'next/navigation';
+import Sidebar from '@/components/shared/Sidebar';
 
 const performanceData = [
   { date: '2023-09-20', buildTime: 100, successRate: 95 },
@@ -52,36 +50,9 @@ const insights = [
 ];
 
 export default function Insights() {
-  const router = useRouter();
   return (
     <div className="flex h-screen bg-gray-100">
-      <div className="w-64 bg-white shadow-md">
-        <div className="p-4">
-          <h1 className="text-2xl font-bold text-gray-800">DevOps Monitor</h1>
-        </div>
-        <nav className="mt-4">
-          <a
-            onClick={() => router.push('/dashboard')}
-            className="block py-2 px-4 text-gray-700  hover:bg-gray-300">
-            Dashboard
-          </a>
-          <a
-            onClick={() => router.push('/overview')}
-            className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            Pipeline Overview
-          </a>
-          <a
-            onClick={() => router.push('/insights')}
-            className="block py-2 px-4 text-gray-700 bg-gray-200 hover:bg-gray-200">
-            Insights
-          </a>
-          <a
-            onClick={() => router.push('/logs')}
-            className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-            Logs
-          </a>
-        </nav>
-      </div>
+      <Sidebar />
 
       {/* Main content */}
       <div className="flex-1 p-8 overflow-auto">
