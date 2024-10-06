@@ -1,8 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import Sidebar from '@/components/shared/Sidebar';
 import { createClient } from '@/utils/supabase/server';
+import dynamic from 'next/dynamic';
 import { redirect } from 'next/navigation';
-import SelectTable from '@/components/shared/SelectTable';
+// import SelectTable from '@/components/shared/SelectTable';
+
+const SelectTable = dynamic(() => import('@/components/shared/SelectTable'), {
+  ssr: false,
+});
 
 export default async function SelectPage() {
   const supabase = createClient();
@@ -20,7 +25,7 @@ export default async function SelectPage() {
     // Redirect to authentication if the session is not available
     redirect('/auth');
   } else {
-    const accessToken = session.provider_token; // This is the GitHub access token
+    const accessToken = session?.provider_token; // This is the GitHub access token
 
     // Fetch user organizations
     const githubOrganizationsResponse = await fetch(

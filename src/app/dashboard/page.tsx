@@ -1,12 +1,3 @@
-// import {
-//   BarChart,
-//   Bar,
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   ResponsiveContainer,
-// } from 'recharts';
 import { AlertTriangle, CheckCircle, XCircle } from 'lucide-react';
 
 import {
@@ -17,29 +8,53 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
+
 import Sidebar from '@/components/shared/Sidebar';
 import { createClient } from '@/utils/supabase/server';
 import { redirect } from 'next/navigation';
 
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
+
 const pipelineData = [
-  { name: 'Jenkins', status: 'healthy', buildTime: 120, errorRate: 2 },
-  { name: 'CircleCI', status: 'warning', buildTime: 150, errorRate: 5 },
-  { name: 'GitLab CI', status: 'failure', buildTime: 90, errorRate: 10 },
-  { name: 'GitHub Actions', status: 'healthy', buildTime: 100, errorRate: 1 },
-];
-
-// const historicalData = [
-//   { name: 'Week 1', buildTime: 100, errorRate: 5 },
-//   { name: 'Week 2', buildTime: 110, errorRate: 4 },
-//   { name: 'Week 3', buildTime: 95, errorRate: 6 },
-//   { name: 'Week 4', buildTime: 105, errorRate: 3 },
-// ];
-
-const insights = [
-  'Optimize Docker image caching to reduce build times by up to 25%',
-  'Implement parallel testing to speed up the test suite execution',
-  'Consider upgrading to a higher-tier CI/CD plan for faster concurrent builds',
+  {
+    name: 'Jenkins',
+    status: 'healthy',
+    buildTime: 120,
+    errorRate: 2,
+    lastRun: '2023-09-26 15:30:00',
+    branch: 'main',
+  },
+  {
+    name: 'CircleCI',
+    status: 'warning',
+    buildTime: 150,
+    errorRate: 5,
+    lastRun: '2023-09-26 14:45:00',
+    branch: 'feature/new-ui',
+  },
+  {
+    name: 'GitLab CI',
+    status: 'failure',
+    buildTime: 90,
+    errorRate: 10,
+    lastRun: '2023-09-26 13:15:00',
+    branch: 'hotfix/critical-bug',
+  },
+  {
+    name: 'GitHub Actions',
+    status: 'healthy',
+    buildTime: 100,
+    errorRate: 1,
+    lastRun: '2023-09-26 12:00:00',
+    branch: 'develop',
+  },
 ];
 
 const recentAlerts = [
@@ -69,10 +84,7 @@ export default async function Dashboard() {
     redirect('/auth');
   }
 
-  const { data: pipelineData2 } = await supabase
-    .from('repositories')
-    .select('*')
-    .eq('user_id', data.user.id);
+  const pipelineData2 = true;
 
   return (
     <div className="flex h-screen bg-gray-100">
@@ -84,55 +96,56 @@ export default async function Dashboard() {
           <h2 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
 
           {/* Pipeline Status Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            {pipelineData.map((pipeline) => (
-              <Card key={pipeline.name}>
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">
-                    {pipeline.name}
-                  </CardTitle>
-                  {pipeline.status === 'healthy' && (
-                    <CheckCircle className="h-4 w-4 text-green-500" />
-                  )}
-                  {pipeline.status === 'warning' && (
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  )}
-                  {pipeline.status === 'failure' && (
-                    <XCircle className="h-4 w-4 text-red-500" />
-                  )}
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold">
-                    {pipeline.buildTime}s
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Avg. Build Time
-                  </p>
-                  <Progress value={100 - pipeline.errorRate} className="mt-2" />
-                  <p className="text-xs text-muted-foreground mt-1">
-                    Success Rate: {100 - pipeline.errorRate}%
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-
-          {/* Build Insights */}
           <Card className="mb-8">
             <CardHeader>
-              <CardTitle>AI-Powered Build Insights</CardTitle>
+              <CardTitle>CI/CD Pipeline Status</CardTitle>
               <CardDescription>
-                Optimization suggestions to improve your CI/CD pipeline
+                Detailed view of all pipeline statuses
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <ul className="list-disc pl-5 space-y-2">
-                {insights.map((insight, index) => (
-                  <li key={index} className="text-sm text-gray-600">
-                    {insight}
-                  </li>
-                ))}
-              </ul>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Pipeline</TableHead>
+                    <TableHead>Status</TableHead>
+                    <TableHead>Build Time</TableHead>
+                    <TableHead>Error Rate</TableHead>
+                    <TableHead>Last Run</TableHead>
+                    <TableHead>Branch</TableHead>
+                    <TableHead>Actions</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {pipelineData.map((pipeline) => (
+                    <TableRow key={pipeline.name}>
+                      <TableCell className="font-medium">
+                        {pipeline.name}
+                      </TableCell>
+                      <TableCell>
+                        {pipeline.status === 'healthy' && (
+                          <CheckCircle className="h-4 w-4 text-green-500" />
+                        )}
+                        {pipeline.status === 'warning' && (
+                          <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                        )}
+                        {pipeline.status === 'failure' && (
+                          <XCircle className="h-4 w-4 text-red-500" />
+                        )}
+                      </TableCell>
+                      <TableCell>{pipeline.buildTime}s</TableCell>
+                      <TableCell>{pipeline.errorRate}%</TableCell>
+                      <TableCell>{pipeline.lastRun}</TableCell>
+                      <TableCell>{pipeline.branch}</TableCell>
+                      <TableCell>
+                        <Button variant="outline" size="sm">
+                          View Details
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
             </CardContent>
           </Card>
 
@@ -155,39 +168,6 @@ export default async function Dashboard() {
                   </Button>
                 </div>
               ))}
-            </CardContent>
-          </Card>
-
-          {/* Historical Trends */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Historical Trends</CardTitle>
-              <CardDescription>
-                Build time and error frequency over the past 4 weeks
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              {/* <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={historicalData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                <Tooltip />
-                <Bar
-                  yAxisId="left"
-                  dataKey="buildTime"
-                  fill="#8884d8"
-                  name="Build Time (s)"
-                />
-                <Bar
-                  yAxisId="right"
-                  dataKey="errorRate"
-                  fill="#82ca9d"
-                  name="Error Rate (%)"
-                />
-              </BarChart>
-            </ResponsiveContainer> */}
             </CardContent>
           </Card>
         </div>
