@@ -21,7 +21,7 @@ export default function Sidebar({ user }: { user: any }) {
 
   return (
     <div className="w-64 bg-white shadow-md">
-      <h1 className="text-2xl font-bold text-gray-800 p-4">DevOps Monitor</h1>
+      <h1 className="text-2xl font-bold text-gray-800 p-4">CI/CDfy</h1>
 
       <div className="p-4 flex flex-rows items-center space-x-2">
         <Image

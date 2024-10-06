@@ -36,7 +36,6 @@ export default async function SelectPage() {
 
     // Combine both repositories and organizations into a single array
     finalData = [
-      // Map organizations to the required format
       ...organizations.map((org: any) => ({
         id: org.id, // The organization ID
         owner: org.login, // The organization username
@@ -50,7 +49,6 @@ export default async function SelectPage() {
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar user={data?.user} />
-
       <SelectTable data={finalData ?? []} />
     </div>
   );
