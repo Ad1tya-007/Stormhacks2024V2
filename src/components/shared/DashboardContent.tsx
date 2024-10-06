@@ -18,6 +18,14 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
 
 export default function DashboardContent() {
@@ -54,8 +62,51 @@ export default function DashboardContent() {
   }, [selectedOrg]);
 
   const firstTable = data.filter((d: any) => d.identifier === 1);
-  console.log('🚀 ~ DashboardContent ~ firstTable:', firstTable);
   const secondTable = data.filter((d: any) => d.identifier === 2);
+
+  const onSlackClick = (message: any) => {
+    fetch('/slack', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message: message }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log('Success');
+        } else {
+          return response.json().then((error) => {
+            console.error('Error:', error);
+          });
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  };
+
+  const onJiraClick = (res: any) => {
+    // fetch('/slack', {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({ message: message }),
+    // })
+    //   .then((response) => {
+    //     if (response.ok) {
+    //       console.log('Success');
+    //     } else {
+    //       return response.json().then((error) => {
+    //         console.error('Error:', error);
+    //       });
+    //     }
+    //   })
+    //   .catch((error) => {
+    //     console.error('Error:', error);
+    //   });
+  };
 
   return (
     <>
@@ -104,9 +155,38 @@ export default function DashboardContent() {
                       <TableCell>{pipeline.last_commit_message}</TableCell>
                       <TableCell>
                         {pipeline.build_status === 'failure' && (
-                          <Button variant="outline" size="sm">
-                            View Details
-                          </Button>
+                          <Dialog>
+                            <DialogTrigger>
+                              <Button variant="outline" size="sm">
+                                View Logs
+                              </Button>
+                            </DialogTrigger>
+                            <DialogContent className="w-[800px]">
+                              <DialogHeader>
+                                <DialogTitle>Logs</DialogTitle>
+                              </DialogHeader>
+                              <div className="flex flex-col space-y-2">
+                                <div className="border p-2 text-xs">
+                                  {pipeline.log}
+                                </div>
+                                <div className="border p-2 text-xs">
+                                  {pipeline.openairesponse}
+                                </div>
+                              </div>
+                              <DialogFooter className="flex flex-row space-x-2">
+                                <Button
+                                  onClick={() => onSlackClick(pipeline.log)}>
+                                  Send Logs to Slack
+                                </Button>
+                                <Button
+                                  onClick={() =>
+                                    onJiraClick(pipeline.openairesponse)
+                                  }>
+                                  Create Task in Jira
+                                </Button>
+                              </DialogFooter>
+                            </DialogContent>
+                          </Dialog>
                         )}
                       </TableCell>
                     </TableRow>
