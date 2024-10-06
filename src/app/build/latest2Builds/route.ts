@@ -1,6 +1,7 @@
 import { Octokit } from '@octokit/rest';
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
+import JSZip from 'jszip';
 
 const octokit = new Octokit({
   auth: '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',
@@ -11,6 +12,38 @@ const openai = new OpenAI({
       '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',
 });
 
+async function getBuildLogDirectly(owner: string, repo: string, runId: number) {
+    try {
+      // Directly use octokit to get the logs
+      const logResponse = await octokit.rest.actions.downloadWorkflowRunLogs({
+        owner,
+        repo,
+        run_id: runId,
+      });
+  
+      return logResponse.data; 
+    } catch (error) {
+      console.error('Error fetching build log directly:', error);
+      throw new Error(`Failed to fetch build log for run ID ${runId}: ${error.message}`);
+    }
+  }
+  
+  async function extractDynamicBuildLog(arrayBuffer: ArrayBuffer) {
+    try {
+        const zip = new JSZip();
+        const unzipped = await zip.loadAsync(arrayBuffer);
+
+        const logFile = unzipped.file(/.*Build\.txt$/)[0];
+        if (!logFile) {
+            throw new Error('No build log file found in the zip archive.');
+        }
+        const logContent = await logFile.async('text');
+        return logContent;
+    } catch (error: any) {
+        console.error('Error extracting logs:', error);
+        throw new Error(`Failed to extract logs: ${error.message}`);
+    }
+  }
 async function getAllRepositories(org: string) {
     try {
       const response = await octokit.rest.repos.listForOrg({
@@ -36,6 +69,22 @@ async function getAllRepositories(org: string) {
     } catch (error) {
       console.error('Error fetching workflow runs:', error);
       throw new Error('Failed to fetch workflow runs');
+    }
+  }
+  async function getOpenAIResponse(logContent: string) {
+    try {
+      const response = await openai.chat.completions.create({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          { role: 'system', content: 'Analyze this build log and identify the cause of failure.' },
+          { role: 'user', content: logContent },
+        ],
+      });
+  
+      return response.choices[0].message.content;
+    } catch (error) {
+      console.error('Error generating OpenAI response:', error);
+      throw new Error('Failed to generate OpenAI response.');
     }
   }
   
@@ -65,6 +114,18 @@ async function getAllRepositories(org: string) {
             "run_id": run.id, // Run ID for fetching logs
             "identifier": index + 1 // 1 for latest, 2 for second latest
           };
+          if (build["build-status"] === 'failure' && build["identifier"] === 1) {
+            // Fetch logs and generate OpenAI response
+            const logZip = await getBuildLogDirectly(repo.owner.login, repo.name, run.id);
+            const logContent = await extractDynamicBuildLog(logZip);
+            const openaiResponse = await getOpenAIResponse(logContent);
+  
+            // Add log and OpenAI response to the build object
+            build['log'] = logContent;
+            build['openairesponse'] = openaiResponse;
+          }
+  
+          allBuilds.push(build);
         });
   
         allBuilds.push(...builds); // Combine all builds into a single array
