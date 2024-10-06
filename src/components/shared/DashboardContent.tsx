@@ -27,12 +27,14 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function DashboardContent() {
+  const { toast } = useToast();
   const [selectedOrg] = useState<any>(() =>
     JSON.parse(window.localStorage.getItem('org') ?? 'null')
   );
-  const [data, setData] = useState<any>([]);
+  const [data, setData] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -74,15 +76,24 @@ export default function DashboardContent() {
     })
       .then((response) => {
         if (response.ok) {
-          console.log('Success');
+          toast({
+            title: 'Success',
+            description: 'Successfully sent logs to Slack.',
+          });
         } else {
           return response.json().then((error) => {
-            console.error('Error:', error);
+            toast({
+              title: 'Error',
+              description: `${error.message}`,
+            });
           });
         }
       })
       .catch((error) => {
-        console.error('Error:', error);
+        toast({
+          title: 'Error',
+          description: `${error.message}`,
+        });
       });
   };
 
@@ -96,15 +107,24 @@ export default function DashboardContent() {
     })
       .then((response) => {
         if (response.ok) {
-          console.log('Success');
+          toast({
+            title: 'Success',
+            description: 'Successfully created a task in Jira.',
+          });
         } else {
           return response.json().then((error) => {
-            console.error('Error:', error);
+            toast({
+              title: 'Error',
+              description: `${error.message}`,
+            });
           });
         }
       })
       .catch((error) => {
-        console.error('Error:', error);
+        toast({
+          title: 'Error',
+          description: `${error.message}`,
+        });
       });
   };
 

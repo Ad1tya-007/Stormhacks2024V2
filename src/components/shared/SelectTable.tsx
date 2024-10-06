@@ -19,8 +19,11 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 export default function SelectTable({ data }: { data: any }) {
+  const { toast } = useToast();
+
   const [filter, setFilter] = useState<string>('');
   const [selectedOrg, setSelectedOrg] = useState<any>(() =>
     JSON.parse(window.localStorage.getItem('org') ?? 'null')
@@ -34,8 +37,19 @@ export default function SelectTable({ data }: { data: any }) {
   );
 
   const handleSelect = (item: any) => {
-    setSelectedOrg(item);
-    window.localStorage.setItem('org', JSON.stringify(item));
+    try {
+      setSelectedOrg(item);
+      window.localStorage.setItem('org', JSON.stringify(item));
+      toast({
+        title: 'Success',
+        description: 'Organization selected successfully.',
+      });
+    } catch (error: any) {
+      toast({
+        title: 'Error',
+        description: `${error.message}`,
+      });
+    }
   };
 
   useEffect(() => {
