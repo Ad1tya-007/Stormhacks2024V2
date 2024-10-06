@@ -177,8 +177,8 @@ export default function AnalyticsContent() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Status</TableHead>
                     <TableHead>Pipeline</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Time(ms)</TableHead>
                     <TableHead>Message</TableHead>
                   </TableRow>
@@ -186,8 +186,19 @@ export default function AnalyticsContent() {
                 <TableBody>
                   {data?.map((entry) => (
                     <TableRow key={entry.run_id}>
-                      <TableCell>{entry.build_status}</TableCell>
                       <TableCell>{entry.repo}</TableCell>
+                      <TableCell className="flex flex-row items-center space-x-2">
+                        {entry.build_status === 'success' && (
+                          <CheckCircle className="h-5 w-5" color="green" />
+                        )}
+                        {entry.build_status === 'failure' && (
+                          <AlertTriangle className="h-5 w-5" color="red" />
+                        )}
+                        {entry.build_status === 'cancelled' && (
+                          <XCircle className="h-5 w-5" color="red" />
+                        )}
+                        <span>{entry.build_status}</span>
+                      </TableCell>
                       <TableCell>{entry.time_taken_ms}</TableCell>
                       <TableCell className="truncate">
                         {entry.last_commit_message}
