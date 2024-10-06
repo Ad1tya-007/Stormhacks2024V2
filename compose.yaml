@@ -3,7 +3,7 @@ services:
     restart: unless-stopped
     # domainname: mydomain.com # if you want to use your own domain
     build:
-      context: ./app
+      context: ./
       dockerfile: Dockerfile
     ports:
       - target: 3000
