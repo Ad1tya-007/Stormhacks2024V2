@@ -1,8 +1,10 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 'use client';
 
 import { logout } from '@/utils/supabase/actions';
+import Image from 'next/image';
 
-export default function Sidebar() {
+export default function Sidebar({ user }: { user: any }) {
   const onLogoutClick = async () => {
     try {
       await logout()
@@ -19,8 +21,19 @@ export default function Sidebar() {
 
   return (
     <div className="w-64 bg-white shadow-md">
-      <div className="p-4">
-        <h1 className="text-2xl font-bold text-gray-800">DevOps Monitor</h1>
+      <h1 className="text-2xl font-bold text-gray-800 p-4">DevOps Monitor</h1>
+
+      <div className="p-4 flex flex-rows items-center space-x-2">
+        <Image
+          src={user?.user_metadata?.avatar_url}
+          height={40}
+          width={40}
+          className="rounded-full"
+          alt="avatar"
+        />
+        <h1 className="text-xl font-bold text-gray-800">
+          {user?.user_metadata?.user_name}
+        </h1>
       </div>
       <nav className="mt-4 ">
         <a

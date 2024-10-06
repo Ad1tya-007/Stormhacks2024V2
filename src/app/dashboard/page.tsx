@@ -71,7 +71,7 @@ export default async function Dashboard() {
 
   return (
     <div className="flex h-screen bg-gray-100">
-      <Sidebar />
+      <Sidebar user={data.user} />
 
       {/* Main content */}
       <div className="flex-1 p-8 overflow-auto">
