@@ -8,15 +8,7 @@ import {
 } from '@/components/ui/card';
 import { AlertTriangle } from 'lucide-react';
 
-interface ErrorPageProps {
-  statusCode?: number;
-  message?: string;
-}
-
-export default function ErrorPage({
-  statusCode = 404,
-  message = 'Page not found',
-}: ErrorPageProps) {
+export default function ErrorPage() {
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-md">
@@ -25,10 +17,10 @@ export default function ErrorPage({
             <AlertTriangle className="h-16 w-16 text-yellow-500" />
           </div>
           <CardTitle className="text-3xl font-bold text-gray-800 mb-2">
-            Error {statusCode}
+            Error 404
           </CardTitle>
           <CardDescription className="text-lg text-gray-600">
-            {message}
+            Page not found
           </CardDescription>
         </CardHeader>
         <CardContent className="flex flex-col items-center space-y-4">
