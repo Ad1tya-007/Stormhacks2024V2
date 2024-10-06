@@ -1,3 +1,5 @@
+/* eslint-disable prefer-const */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @next/next/no-async-client-component */
 'use client';
@@ -22,31 +24,36 @@ import {
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useEffect, useState } from 'react';
-// import {
-//   XAxis,
-//   YAxis,
-//   CartesianGrid,
-//   Tooltip,
-//   ResponsiveContainer,
-//   LineChart,
-//   Line,
-// } from 'recharts';
+import {
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+  Legend,
+} from 'recharts';
 
-// const performanceData = [
-//   { date: '2023-09-20', buildTime: 100, successRate: 95 },
-//   { date: '2023-09-21', buildTime: 110, successRate: 93 },
-//   { date: '2023-09-22', buildTime: 95, successRate: 97 },
-//   { date: '2023-09-23', buildTime: 105, successRate: 94 },
-//   { date: '2023-09-24', buildTime: 98, successRate: 96 },
-//   { date: '2023-09-25', buildTime: 92, successRate: 98 },
-//   { date: '2023-09-26', buildTime: 88, successRate: 99 },
-// ];
+const colors = [
+  '#8884d8', // Soft Purple
+  '#82ca9d', // Soft Green
+  '#ffc658', // Soft Yellow
+  '#ff8042', // Soft Orange
+  '#a4de6c', // Light Green
+  '#d0ed57', // Lemon Yellow
+  '#0088FE', // Bright Blue
+  '#FFBB28', // Soft Yellow Orange
+  '#FF4444', // Bright Red
+  '#00C49F', // Teal
+];
 
 export default function AnalyticsContent() {
   const [selectedOrg] = useState<any>(() =>
     JSON.parse(window.localStorage.getItem('org') ?? 'null')
   );
   const [data, setData] = useState<any>([]);
+  console.log('🚀 ~ AnalyticsContent ~ data:', data);
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 10;
 
@@ -93,6 +100,42 @@ export default function AnalyticsContent() {
     fetchData(); // Call the function to fetch data
   }, [selectedOrg]);
 
+  let transformedData: { name: string; build_times: number[] }[] = [];
+
+  data.forEach((obj: any) => {
+    // Find if the repo name already exists in the transformedData array
+    let existingRepo = transformedData.find(
+      (item: any) => item.name === obj.repo
+    );
+
+    if (existingRepo) {
+      // If it exists, just push the new build time into its build_times array
+      existingRepo.build_times.push(obj.time_taken_ms / 1000);
+    } else {
+      // If it doesn't exist, add a new object with name_of_repo and build_times array
+      transformedData.push({
+        name: obj.repo,
+        build_times: [obj.time_taken_ms / 1000],
+      });
+    }
+  });
+
+  // Prepare the data for the chart using index as the x-axis
+
+  const maxBuilds = Math.max(
+    ...transformedData.map((repo) => repo.build_times.length)
+  ); // Find the maximum number of builds
+  const data2 = Array.from({ length: maxBuilds }, (_, index) => {
+    const entry: { [key: string]: number } = { index }; // Use index for x-axis
+    transformedData.forEach((repo) => {
+      entry[`buildTime_${repo.name}`] = repo.build_times[index]; // Add build time for each repo
+    });
+    return entry;
+  });
+
+  // Colors for the lines
+  const colors = ['#8884d8', '#82ca9d', '#ffc658'];
+
   return (
     <Tabs defaultValue="logs" className="w-full">
       <TabsList>
@@ -108,29 +151,42 @@ export default function AnalyticsContent() {
             </CardDescription>
           </CardHeader>
           <CardContent>
-            {/* <ResponsiveContainer width="100%" height={300}>
-              <LineChart data={performanceData}>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={data2}>
                 <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="date" />
-                <YAxis yAxisId="left" orientation="left" stroke="#8884d8" />
-                <YAxis yAxisId="right" orientation="right" stroke="#82ca9d" />
-                <Tooltip />
-                <Line
+                <XAxis
+                  dataKey="index"
+                  label={{
+                    position: 'insideBottomRight',
+                    offset: 0,
+                  }}
+                />
+                <YAxis
                   yAxisId="left"
-                  type="monotone"
-                  dataKey="buildTime"
+                  orientation="left"
                   stroke="#8884d8"
-                  name="Build Time (s)"
+                  label={{
+                    value: 'Build Time (s)',
+                    angle: -90,
+                    position: 'insideLeft',
+                  }}
                 />
-                <Line
-                  yAxisId="right"
-                  type="monotone"
-                  dataKey="successRate"
-                  stroke="#82ca9d"
-                  name="Success Rate (%)"
-                />
+                <Tooltip />
+                <Legend />
+
+                {/* Dynamically generate lines for each repo */}
+                {transformedData.map((d, index) => (
+                  <Line
+                    key={d.name}
+                    yAxisId="left"
+                    type="monotone"
+                    dataKey={`buildTime_${d.name}`}
+                    stroke={colors[index % colors.length]} // Rotate through colors
+                    name={`${d.name} Build Time (s)`}
+                  />
+                ))}
               </LineChart>
-            </ResponsiveContainer> */}
+            </ResponsiveContainer>
           </CardContent>
         </Card>
       </TabsContent>
