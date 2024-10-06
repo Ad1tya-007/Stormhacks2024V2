@@ -67,12 +67,24 @@ export default function DashboardContent() {
   const secondTable = data.filter((d: any) => d.identifier === 2);
 
   const onSlackClick = (message: any) => {
+    const keys = JSON.parse(window.localStorage.getItem('keys') ?? 'null');
+    if (!keys || !keys.slackBotToken || !keys.slackChannelToken) {
+      toast({
+        title: 'Error',
+        description: 'Please set Slack keys in the settings.',
+      });
+      return;
+    }
     fetch('/slack', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ message: message }),
+      body: JSON.stringify({
+        message: message,
+        channel: keys.slackChannelToken,
+        slack_bot_token: keys.slackBotToken,
+      }),
     })
       .then((response) => {
         if (response.ok) {
@@ -98,12 +110,33 @@ export default function DashboardContent() {
   };
 
   const onJiraClick = (title: any, description: any) => {
+    const keys = JSON.parse(window.localStorage.getItem('keys') ?? 'null');
+    if (
+      !keys ||
+      !keys.jiraEmail ||
+      !keys.jiraApiToken ||
+      !keys.jiraProjectKey ||
+      !keys.jiraDomain
+    ) {
+      toast({
+        title: 'Error',
+        description: 'Please set Jira keys in the settings.',
+      });
+      return;
+    }
     fetch('/jira', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({ title: title, description: description }),
+      body: JSON.stringify({
+        title: title,
+        description: description,
+        jiraEmail: keys.jiraEmail,
+        jiraApiToken: keys.jiraApiToken,
+        jiraProjectKey: keys.jiraProjectKey,
+        jiraDomain: keys.jiraDomain,
+      }),
     })
       .then((response) => {
         if (response.ok) {

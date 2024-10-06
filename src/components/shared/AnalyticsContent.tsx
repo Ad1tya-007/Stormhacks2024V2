@@ -142,9 +142,6 @@ export default function AnalyticsContent() {
     return entry;
   });
 
-  // Colors for the lines
-  const colors = ['#8884d8', '#82ca9d', '#ffc658'];
-
   return (
     <Tabs defaultValue="logs" className="w-full">
       <TabsList>
@@ -191,7 +188,7 @@ export default function AnalyticsContent() {
                     type="monotone"
                     dataKey={`buildTime_${d.name}`}
                     stroke={colors[index % colors.length]} // Rotate through colors
-                    name={`${d.name} Build Time (s)`}
+                    name={`${d.name}`}
                   />
                 ))}
               </LineChart>

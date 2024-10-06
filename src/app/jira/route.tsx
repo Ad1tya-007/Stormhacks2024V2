@@ -6,16 +6,18 @@ export async function POST(request: Request) {
   const body = await request.json();
   const title = body.title;
   const description = body.description;
-  const auth = Buffer.from(
-    `${process.env.JIRA_EMAIL}:${process.env.JIRA_API_TOKEN}`
-  ).toString('base64');
-  const jiraUrl = `https://${process.env.JIRA_DOMAIN}/rest/api/3/issue`;
+  const jiraEmail = body.jiraEmail;
+  const jiraApiToken = body.jiraApiToken;
+  const jiraProjectKey = body.jiraProjectKey;
+  const jiraDomain = body.jiraDomain;
+  const auth = Buffer.from(`${jiraEmail}:${jiraApiToken}`).toString('base64');
+  const jiraUrl = `https://${jiraDomain}/rest/api/3/issue`;
 
   // Constructing the issueData payload for the Jira task, with ADF format for the description
   const issueData = {
     fields: {
       project: {
-        key: process.env.JIRA_PROJECT_KEY, // Ensure this is correct
+        key: jiraProjectKey, // Ensure this is correct
       },
       summary: `Fix Build Issues of ${title}`, // Task title
       description: {
