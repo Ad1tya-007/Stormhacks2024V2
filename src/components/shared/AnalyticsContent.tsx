@@ -52,8 +52,17 @@ export default function AnalyticsContent() {
   const [selectedOrg] = useState<any>(() =>
     JSON.parse(window.localStorage.getItem('org') ?? 'null')
   );
+  const [text, setText] = useState<string>('');
   const [data, setData] = useState<any>([]);
-  console.log('🚀 ~ AnalyticsContent ~ data:', data);
+
+  let filteredData = data.filter((entry: any) => {
+    return (
+      entry.repo.toLowerCase().includes(text.toLowerCase()) ||
+      entry.last_commit_message.toLowerCase().includes(text.toLowerCase()) ||
+      entry.build_status.toLowerCase().includes(text.toLowerCase())
+    );
+  });
+
   const [currentPage, setCurrentPage] = useState(1);
   const logsPerPage = 10;
 
@@ -63,7 +72,7 @@ export default function AnalyticsContent() {
   // Get current logs for the page
   const indexOfLastLog = currentPage * logsPerPage;
   const indexOfFirstLog = indexOfLastLog - logsPerPage;
-  const currentLogs = data.slice(indexOfFirstLog, indexOfLastLog);
+  const currentLogs = filteredData.slice(indexOfFirstLog, indexOfLastLog);
 
   // Function to handle page change
   const handlePageChange = (newPage: number) => {
@@ -202,7 +211,11 @@ export default function AnalyticsContent() {
             <CardContent>
               <div className="flex space-x-4">
                 <div className="flex-1">
-                  <Input type="text" placeholder="Search logs..." />
+                  <Input
+                    type="text"
+                    placeholder="Search logs..."
+                    onChange={(e) => setText(e.target.value)}
+                  />
                 </div>
               </div>
             </CardContent>

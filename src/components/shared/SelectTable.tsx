@@ -18,7 +18,6 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 export default function SelectTable({ data }: { data: any }) {
@@ -59,8 +58,7 @@ export default function SelectTable({ data }: { data: any }) {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex items-center space-x-2 mb-4">
-            <Search className="text-gray-400" />
+          <div className="flex items-center mb-4">
             <Input
               type="text"
               placeholder="Filter organizations..."
