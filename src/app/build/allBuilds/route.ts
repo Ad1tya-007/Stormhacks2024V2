@@ -56,11 +56,11 @@ export async function POST(request: Request) {
           new Date(run.updated_at).getTime() -
           new Date(run.created_at).getTime(); // Time in ms
         return {
-          'parent-org': org,
+          parent_org: org,
           repo: repo.name,
-          'build-status': run.conclusion,
-          'time-taken-ms': timeTaken,
-          'last-commit-message': run.head_commit?.message,
+          build_status: run.conclusion,
+          time_taken_ms: timeTaken,
+          last_commit_message: run.head_commit?.message,
           run_id: run.id, // Run ID for fetching logs
         };
       });

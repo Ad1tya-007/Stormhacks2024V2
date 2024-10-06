@@ -39,44 +39,6 @@ import { useEffect, useState } from 'react';
 //   Line,
 // } from 'recharts';
 
-const logEntries = [
-  {
-    id: 1,
-    timestamp: '2023-09-26 15:30:00',
-    level: 'INFO',
-    message: 'Build #1234 started for project XYZ',
-    pipeline: 'Jenkins',
-  },
-  {
-    id: 2,
-    timestamp: '2023-09-26 15:31:15',
-    level: 'WARNING',
-    message: 'Test coverage below threshold',
-    pipeline: 'CircleCI',
-  },
-  {
-    id: 3,
-    timestamp: '2023-09-26 15:32:30',
-    level: 'ERROR',
-    message: 'Deployment failed: Unable to connect to server',
-    pipeline: 'GitLab CI',
-  },
-  {
-    id: 4,
-    timestamp: '2023-09-26 15:33:45',
-    level: 'INFO',
-    message: 'Pull request #567 merged successfully',
-    pipeline: 'GitHub Actions',
-  },
-  {
-    id: 5,
-    timestamp: '2023-09-26 15:34:00',
-    level: 'ERROR',
-    message: 'Build #1235 failed: Compilation error',
-    pipeline: 'Jenkins',
-  },
-];
-
 // const performanceData = [
 //   { date: '2023-09-20', buildTime: 100, successRate: 95 },
 //   { date: '2023-09-21', buildTime: 110, successRate: 93 },
@@ -109,7 +71,6 @@ export default function AnalyticsContent() {
 
           // Parse the response from the POST request
           const allBuilds = await response.json();
-          console.log('🚀 ~ AnalyticsContent ~ allBuilds:', allBuilds);
 
           // Set the data state with the fetched builds
           setData(allBuilds);
@@ -121,8 +82,6 @@ export default function AnalyticsContent() {
 
     fetchData(); // Call the function to fetch data
   }, [selectedOrg]);
-
-  console.log(data);
 
   return (
     <Tabs defaultValue="logs" className="w-full">
@@ -218,37 +177,25 @@ export default function AnalyticsContent() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Timestamp</TableHead>
-                    <TableHead>Level</TableHead>
-                    <TableHead>Message</TableHead>
+                    <TableHead>Status</TableHead>
                     <TableHead>Pipeline</TableHead>
+                    <TableHead>Time(ms)</TableHead>
+                    <TableHead>Message</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {logEntries.map((entry) => (
-                    <TableRow key={entry.id}>
-                      <TableCell>{entry.timestamp}</TableCell>
-                      <TableCell>
-                        {entry.level === 'INFO' && (
-                          <CheckCircle className="h-4 w-4 text-green-500" />
-                        )}
-                        {entry.level === 'WARNING' && (
-                          <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                        )}
-                        {entry.level === 'ERROR' && (
-                          <XCircle className="h-4 w-4 text-red-500" />
-                        )}
-                        <span className="ml-2">{entry.level}</span>
+                  {data?.map((entry) => (
+                    <TableRow key={entry.run_id}>
+                      <TableCell>{entry.build_status}</TableCell>
+                      <TableCell>{entry.repo}</TableCell>
+                      <TableCell>{entry.time_taken_ms}</TableCell>
+                      <TableCell className="truncate">
+                        {entry.last_commit_message}
                       </TableCell>
-                      <TableCell>{entry.message}</TableCell>
-                      <TableCell>{entry.pipeline}</TableCell>
                     </TableRow>
                   ))}
                 </TableBody>
               </Table>
-              <div className="mt-4 flex justify-center">
-                <Button variant="outline">Load More Logs</Button>
-              </div>
             </CardContent>
           </Card>
         </div>
