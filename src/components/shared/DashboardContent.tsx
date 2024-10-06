@@ -86,26 +86,26 @@ export default function DashboardContent() {
       });
   };
 
-  const onJiraClick = (res: any) => {
-    // fetch('/slack', {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({ message: message }),
-    // })
-    //   .then((response) => {
-    //     if (response.ok) {
-    //       console.log('Success');
-    //     } else {
-    //       return response.json().then((error) => {
-    //         console.error('Error:', error);
-    //       });
-    //     }
-    //   })
-    //   .catch((error) => {
-    //     console.error('Error:', error);
-    //   });
+  const onJiraClick = (title: any, description: any) => {
+    fetch('/jira', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ title: title, description: description }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          console.log('Success');
+        } else {
+          return response.json().then((error) => {
+            console.error('Error:', error);
+          });
+        }
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
   };
 
   return (
@@ -180,7 +180,10 @@ export default function DashboardContent() {
                                 </Button>
                                 <Button
                                   onClick={() =>
-                                    onJiraClick(pipeline.openairesponse)
+                                    onJiraClick(
+                                      pipeline.repo,
+                                      pipeline.openairesponse
+                                    )
                                   }>
                                   Create Task in Jira
                                 </Button>
