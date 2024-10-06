@@ -103,26 +103,26 @@ export async function GET() {
       if (latestBuild["build-status"] === "failure") {
         console.log("The latest build was a failure.");
         const data1 = await getBuildLogDirectly(owner, repo, latestBuild["run_id"]); 
-        const logContent = await extractDynamicBuildLog(data1);
+        const logContent = await extractDynamicBuildLog(data1 as ArrayBuffer);
 
         const prompt = logContent;
 
         const response = await openai.chat.completions.create({
-          model: 'gpt-3.5-turbo',
-          messages: [
-            {
-              role: 'user',
-              content: `${prompt} Explain whats wrong with the build`,
-            },
-          ],
+            model: 'gpt-3.5-turbo',
+            messages: [
+                {
+                    role: 'user',
+                    content: `${prompt} Explain whats wrong with the build`,
+                },
+            ],
         });
         OpenAIResponse = response.choices[0].message.content ?? '';
       }
     }
 
     return NextResponse.json({builds, OpenAIResponse}, { status: 200 });
-  } catch (error) {
+} catch (error: any) {
     console.error('Error fetching workflow runs:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
-  }
+}
 }
