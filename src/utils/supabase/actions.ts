@@ -22,7 +22,7 @@ export async function signUpWithGithub() {
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: 'github',
     options: {
-      redirectTo: 'http://localhost:3000/auth/callback',
+      redirectTo: 'https://jh-a-kim-app--3000.prod1.defang.dev/auth/callback',
       scopes: 'read:org user', // Add the necessary scopes here
     },
   });
