@@ -9,8 +9,18 @@ import {
 } from '@/components/ui/card';
 import { GitBranch, GitCommit, GitMerge } from 'lucide-react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
+import { createClient } from '@/utils/supabase/server';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const supabase = createClient();
+
+  const { data } = await supabase.auth.getUser();
+
+  if (data?.user) {
+    redirect('/dashboard');
+  }
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-gray-200 flex flex-col items-center justify-center p-4">
       <Card className="w-full max-w-4xl">

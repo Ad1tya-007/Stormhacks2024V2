@@ -23,6 +23,7 @@ export async function signUpWithGithub() {
     provider: 'github',
     options: {
       redirectTo: 'http://localhost:3000/auth/callback',
+      scopes: 'read:org user', // Add the necessary scopes here
     },
   });
 

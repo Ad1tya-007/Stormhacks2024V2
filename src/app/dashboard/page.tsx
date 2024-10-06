@@ -69,95 +69,105 @@ export default async function Dashboard() {
     redirect('/auth');
   }
 
+  const { data: pipelineData2 } = await supabase
+    .from('repositories')
+    .select('*')
+    .eq('user_id', data.user.id);
+
   return (
     <div className="flex h-screen bg-gray-100">
       <Sidebar user={data.user} />
 
       {/* Main content */}
-      <div className="flex-1 p-8 overflow-auto">
-        <h2 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
+      {pipelineData2 ? (
+        <div className="flex-1 p-8 overflow-auto">
+          <h2 className="text-3xl font-bold text-gray-800 mb-6">Dashboard</h2>
 
-        {/* Pipeline Status Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          {pipelineData.map((pipeline) => (
-            <Card key={pipeline.name}>
-              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">
-                  {pipeline.name}
-                </CardTitle>
-                {pipeline.status === 'healthy' && (
-                  <CheckCircle className="h-4 w-4 text-green-500" />
-                )}
-                {pipeline.status === 'warning' && (
-                  <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                )}
-                {pipeline.status === 'failure' && (
-                  <XCircle className="h-4 w-4 text-red-500" />
-                )}
-              </CardHeader>
-              <CardContent>
-                <div className="text-2xl font-bold">{pipeline.buildTime}s</div>
-                <p className="text-xs text-muted-foreground">Avg. Build Time</p>
-                <Progress value={100 - pipeline.errorRate} className="mt-2" />
-                <p className="text-xs text-muted-foreground mt-1">
-                  Success Rate: {100 - pipeline.errorRate}%
-                </p>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-
-        {/* Build Insights */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>AI-Powered Build Insights</CardTitle>
-            <CardDescription>
-              Optimization suggestions to improve your CI/CD pipeline
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <ul className="list-disc pl-5 space-y-2">
-              {insights.map((insight, index) => (
-                <li key={index} className="text-sm text-gray-600">
-                  {insight}
-                </li>
-              ))}
-            </ul>
-          </CardContent>
-        </Card>
-
-        {/* Error Alerts and Log Viewer */}
-        <Card className="mb-8">
-          <CardHeader>
-            <CardTitle>Recent Alerts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            {recentAlerts.map((alert) => (
-              <div
-                key={alert.id}
-                className="flex items-center justify-between py-2 border-b last:border-b-0">
-                <div>
-                  <p className="text-sm font-medium">{alert.message}</p>
-                  <p className="text-xs text-gray-500">{alert.timestamp}</p>
-                </div>
-                <Button variant="outline" size="sm">
-                  View Log
-                </Button>
-              </div>
+          {/* Pipeline Status Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            {pipelineData.map((pipeline) => (
+              <Card key={pipeline.name}>
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                  <CardTitle className="text-sm font-medium">
+                    {pipeline.name}
+                  </CardTitle>
+                  {pipeline.status === 'healthy' && (
+                    <CheckCircle className="h-4 w-4 text-green-500" />
+                  )}
+                  {pipeline.status === 'warning' && (
+                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
+                  )}
+                  {pipeline.status === 'failure' && (
+                    <XCircle className="h-4 w-4 text-red-500" />
+                  )}
+                </CardHeader>
+                <CardContent>
+                  <div className="text-2xl font-bold">
+                    {pipeline.buildTime}s
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Avg. Build Time
+                  </p>
+                  <Progress value={100 - pipeline.errorRate} className="mt-2" />
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Success Rate: {100 - pipeline.errorRate}%
+                  </p>
+                </CardContent>
+              </Card>
             ))}
-          </CardContent>
-        </Card>
+          </div>
 
-        {/* Historical Trends */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Historical Trends</CardTitle>
-            <CardDescription>
-              Build time and error frequency over the past 4 weeks
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            {/* <ResponsiveContainer width="100%" height={300}>
+          {/* Build Insights */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>AI-Powered Build Insights</CardTitle>
+              <CardDescription>
+                Optimization suggestions to improve your CI/CD pipeline
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <ul className="list-disc pl-5 space-y-2">
+                {insights.map((insight, index) => (
+                  <li key={index} className="text-sm text-gray-600">
+                    {insight}
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
+
+          {/* Error Alerts and Log Viewer */}
+          <Card className="mb-8">
+            <CardHeader>
+              <CardTitle>Recent Alerts</CardTitle>
+            </CardHeader>
+            <CardContent>
+              {recentAlerts.map((alert) => (
+                <div
+                  key={alert.id}
+                  className="flex items-center justify-between py-2 border-b last:border-b-0">
+                  <div>
+                    <p className="text-sm font-medium">{alert.message}</p>
+                    <p className="text-xs text-gray-500">{alert.timestamp}</p>
+                  </div>
+                  <Button variant="outline" size="sm">
+                    View Log
+                  </Button>
+                </div>
+              ))}
+            </CardContent>
+          </Card>
+
+          {/* Historical Trends */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Historical Trends</CardTitle>
+              <CardDescription>
+                Build time and error frequency over the past 4 weeks
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {/* <ResponsiveContainer width="100%" height={300}>
               <BarChart data={historicalData}>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis dataKey="name" />
@@ -178,9 +188,12 @@ export default async function Dashboard() {
                 />
               </BarChart>
             </ResponsiveContainer> */}
-          </CardContent>
-        </Card>
-      </div>
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <div>Please chose a repository/ organization to view the dashboard</div>
+      )}
     </div>
   );
 }

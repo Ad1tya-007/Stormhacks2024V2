@@ -56,6 +56,11 @@ export default function Sidebar({ user }: { user: any }) {
           className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
           Logs
         </a>
+        <a
+          href="/select"
+          className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
+          Select
+        </a>
         <div
           className="block py-2 px-4 text-gray-700 hover:bg-gray-200 cursor-pointer"
           onClick={onLogoutClick}>
