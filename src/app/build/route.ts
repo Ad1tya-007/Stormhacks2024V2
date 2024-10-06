@@ -91,6 +91,7 @@ export async function GET() {
         "time-taken-ms": timeTaken,
         "last-commit-message": run.head_commit?.message, 
         "run_id": run.id, // Run ID for fetching logs
+        "repo": repo,
       };
     });
 
