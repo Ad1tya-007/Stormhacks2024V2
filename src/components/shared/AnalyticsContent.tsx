@@ -50,10 +50,27 @@ import { useEffect, useState } from 'react';
 // ];
 
 export default function AnalyticsContent() {
-  const [selectedOrg, setSelectedOrg] = useState<any>(() =>
+  const [selectedOrg] = useState<any>(() =>
     JSON.parse(window.localStorage.getItem('org') ?? 'null')
   );
   const [data, setData] = useState<any>([]);
+  const [currentPage, setCurrentPage] = useState(1);
+  const logsPerPage = 10;
+
+  // Calculate total pages based on logsPerPage
+  const totalPages = Math.ceil(data.length / logsPerPage);
+
+  // Get current logs for the page
+  const indexOfLastLog = currentPage * logsPerPage;
+  const indexOfFirstLog = indexOfLastLog - logsPerPage;
+  const currentLogs = data.slice(indexOfFirstLog, indexOfLastLog);
+
+  // Function to handle page change
+  const handlePageChange = (newPage: number) => {
+    if (newPage > 0 && newPage <= totalPages) {
+      setCurrentPage(newPage);
+    }
+  };
 
   // useEffect to call the POST request once the component is mounted
   useEffect(() => {
@@ -138,30 +155,6 @@ export default function AnalyticsContent() {
                 <div className="flex-1">
                   <Input type="text" placeholder="Search logs..." />
                 </div>
-                <Select>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Log Level" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Levels</SelectItem>
-                    <SelectItem value="info">Info</SelectItem>
-                    <SelectItem value="warning">Warning</SelectItem>
-                    <SelectItem value="error">Error</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select>
-                  <SelectTrigger className="w-[180px]">
-                    <SelectValue placeholder="Pipeline" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All Pipelines</SelectItem>
-                    <SelectItem value="jenkins">Jenkins</SelectItem>
-                    <SelectItem value="circleci">CircleCI</SelectItem>
-                    <SelectItem value="gitlab">GitLab CI</SelectItem>
-                    <SelectItem value="github">GitHub Actions</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button>Apply Filters</Button>
               </div>
             </CardContent>
           </Card>
@@ -184,7 +177,7 @@ export default function AnalyticsContent() {
                   </TableRow>
                 </TableHeader>
                 <TableBody>
-                  {data?.map((entry) => (
+                  {currentLogs.map((entry: any) => (
                     <TableRow key={entry.run_id}>
                       <TableCell>{entry.repo}</TableCell>
                       <TableCell className="flex flex-row items-center space-x-2">
@@ -207,6 +200,21 @@ export default function AnalyticsContent() {
                   ))}
                 </TableBody>
               </Table>
+              <div className="flex justify-between items-center mt-4">
+                <Button
+                  disabled={currentPage === 1}
+                  onClick={() => handlePageChange(currentPage - 1)}>
+                  Previous
+                </Button>
+                <span>
+                  Page {currentPage} of {totalPages}
+                </span>
+                <Button
+                  disabled={currentPage === totalPages}
+                  onClick={() => handlePageChange(currentPage + 1)}>
+                  Next
+                </Button>
+              </div>
             </CardContent>
           </Card>
         </div>
