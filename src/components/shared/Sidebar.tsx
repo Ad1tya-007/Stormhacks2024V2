@@ -42,19 +42,9 @@ export default function Sidebar({ user }: { user: any }) {
           Dashboard
         </a>
         <a
-          href="/overview"
+          href="/analytics"
           className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-          Pipeline Overview
-        </a>
-        <a
-          href="/insights"
-          className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-          Insights
-        </a>
-        <a
-          href="/logs"
-          className="block py-2 px-4 text-gray-700 hover:bg-gray-200">
-          Logs
+          Analytics
         </a>
         <a
           href="/select"
