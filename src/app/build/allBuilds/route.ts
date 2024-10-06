@@ -38,10 +38,8 @@ async function getAllWorkflowRuns(owner: string, repo: string) {
 
 export async function POST(request: Request) {
   const body = await request.json(); // Read the JSON body
-  console.log('Fetching builds for organization:', body);
   const org = body.org;
 
-  console.log('Fetching builds for organization:', org);
   try {
     const allBuilds: any[] = []; // Array to hold all builds
 
