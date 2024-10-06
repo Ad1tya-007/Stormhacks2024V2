@@ -1,67 +1,33 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { Octokit } from '@octokit/rest';
 import { NextResponse } from 'next/server';
-import JSZip from 'jszip';
-import OpenAI from 'openai';
 
 const octokit = new Octokit({
   auth: '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',
 });
 
-const openai = new OpenAI({
-  apiKey:
-    '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',
-});
-
-const url = "https://github.com/SFU-Surge-Projects-Team-Yellow/backend"; // Static URL
-
-async function getBuildLogDirectly(owner: string, repo: string, runId: number) {
+async function getAllRepositories(org: string) {
   try {
-    // Directly use octokit to get the logs
-    const logResponse = await octokit.rest.actions.downloadWorkflowRunLogs({
-      owner,
-      repo,
-      run_id: runId,
+    const response = await octokit.rest.repos.listForOrg({
+      org,
+      type: 'all', // You can adjust this based on the type of repos you want
+      per_page: 100,
     });
 
-    return logResponse.data; 
+    return response.data;
   } catch (error) {
-    console.error('Error fetching build log directly:', error);
-    throw new Error('Failed to fetch build log');
+    console.error('Error fetching repositories:', error);
+    throw new Error('Failed to fetch repositories');
   }
 }
-
-
-async function extractDynamicBuildLog(arrayBuffer: ArrayBuffer) {
-  try {
-    const zip = new JSZip();
-    const unzipped = await zip.loadAsync(arrayBuffer);
-
-    const logFile = unzipped.file(/.*Build\.txt$/)[0];
-    if (!logFile) {
-      throw new Error('No build log file found.');
-    }
-    const logContent = await logFile.async('text');
-    return logContent;
-  } catch (error) {
-    console.error('Error extracting logs:', error);
-    throw new Error('Failed to extract logs');
-  }
-}
-
 
 async function getAllWorkflowRuns(owner: string, repo: string) {
   try {
     const response = await octokit.rest.actions.listWorkflowRunsForRepo({
       owner,
       repo,
-      per_page: 100, 
-      // status: 'completed', // Only fetch completed runs
+      per_page: 100,
     });
-
-    if (response.data.workflow_runs.length === 0) {
-      throw new Error('No workflow runs found for this repository');
-    }
 
     return response.data.workflow_runs;
   } catch (error) {
@@ -70,59 +36,69 @@ async function getAllWorkflowRuns(owner: string, repo: string) {
   }
 }
 
-export async function GET() {
-  const match = url.match(/github\.com\/([^\/]+)\/([^\/]+)/);
-  if (!match) {
-    return NextResponse.json({ error: 'Invalid repository URL' }, { status: 400 });
-  }
+export async function POST(request: Request) {
+  const body = await request.json(); // Read the JSON body
+  console.log('Fetching builds for organization:', body);
+  const org = body.org;
 
-  const owner = match[1];
-  const repo = match[2];
-
+  console.log('Fetching builds for organization:', org);
   try {
-    let OpenAIResponse = "No response from OpenAI";
-    const workflowRuns = await getAllWorkflowRuns(owner, repo);
+    const allBuilds: any[] = []; // Array to hold all builds
 
-    const builds = workflowRuns.map((run) => {
-      const timeTaken = new Date(run.updated_at).getTime() - new Date(run.created_at).getTime(); // Time in ms
-      return {
-        "parent-org": owner,
-        "build-status": run.conclusion, 
-        "time-taken-ms": timeTaken,
-        "last-commit-message": run.head_commit?.message, 
-        "run_id": run.id, // Run ID for fetching logs
-        "repo": repo,
-      };
-    });
+    const repositories = await getAllRepositories(org);
 
-    if (builds.length === 0) {
-      throw new Error('No builds found for this repository');
-    }
-    else if (builds.length > 0) {
-      const latestBuild = builds[0];
-      if (latestBuild["build-status"] === "failure") {
-        console.log("The latest build was a failure.");
-        const data1 = await getBuildLogDirectly(owner, repo, latestBuild["run_id"]); 
-        const logContent = await extractDynamicBuildLog(data1 as ArrayBuffer);
+    for (const repo of repositories) {
+      const workflowRuns = await getAllWorkflowRuns(
+        repo.owner.login,
+        repo.name
+      );
 
-        const prompt = logContent;
+      const builds = workflowRuns.map((run: any) => {
+        const timeTaken =
+          new Date(run.updated_at).getTime() -
+          new Date(run.created_at).getTime(); // Time in ms
+        return {
+          'parent-org': org,
+          repo: repo.name,
+          'build-status': run.conclusion,
+          'time-taken-ms': timeTaken,
+          'last-commit-message': run.head_commit?.message,
+          run_id: run.id, // Run ID for fetching logs
+        };
+      });
 
-        const response = await openai.chat.completions.create({
-            model: 'gpt-3.5-turbo',
-            messages: [
-                {
-                    role: 'user',
-                    content: `${prompt} Explain whats wrong with the build`,
-                },
-            ],
-        });
-        OpenAIResponse = response.choices[0].message.content ?? '';
-      }
+      allBuilds.push(...builds); // Combine all builds into a single array
     }
 
-    return NextResponse.json({builds, OpenAIResponse}, { status: 200 });
-} catch (error: any) {
-    console.error('Error fetching workflow runs:', error);
+    if (allBuilds.length === 0) {
+      throw new Error(
+        'No builds found for any repositories in this organization'
+      );
+    }
+
+    return NextResponse.json(allBuilds, { status: 200 });
+  } catch (error: any) {
+    console.error('Error fetching builds:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
-}
+
+// if (latestBuild["build-status"] === "failure") {
+//   console.log("The latest build was a failure.");
+//   const data1 = await getBuildLogDirectly(owner, repo, latestBuild["run_id"]);
+//   const logContent = await extractDynamicBuildLog(data1 as ArrayBuffer);
+
+//   const prompt = logContent;
+
+//   const response = await openai.chat.completions.create({
+//       model: 'gpt-3.5-turbo',
+//       messages: [
+//           {
+//               role: 'user',
+//               content: `${prompt} Explain whats wrong with the build`,
+//           },
+//       ],
+//   });
+//   OpenAIResponse = response.choices[0].message.content ?? '';
+// }
+// }
