@@ -1,36 +1,36 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# CI/CDfy
 
-## Getting Started
+## Overview
+CI/CDfy is an intelligent tool designed to continuously monitor the health of CI/CD pipelines and related infrastructure. It provides insights, alerts for build failures, and AI-driven suggestions to optimize build times, deployment processes, and overall pipeline efficiency. The goal is to automate key DevOps tasks, allowing engineering teams to work more effectively and reduce manual troubleshooting.
 
-First, run the development server:
+## Key Features
+* Real-Time Monitoring: Continuously tracks the health and performance of CI/CD pipelines.
+* AI-Powered Insights: Uses AI to analyze build logs, detect bottlenecks, and recommend improvements to speed up builds and reduce failures.
+* Failure Alerts: Sends alerts for build failures and pipeline issues directly to team Slack channels.
+* Task Automation: Automatically creates Jira tasks for build failures, improving communication and tracking.
+* Historical Performance Analysis: Tracks and displays historical build times, error rates, and other key metrics for trend analysis.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Tech Stack
+* Frontend - Nextjs
+* APIs used
+  * Github Octokit
+  * Slack
+  * Jira
+  * OpenAI
+  * Supabase ( Github oauth )
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Installation
+For this to work you need a .env.local in which you should have Supabase **URL** and **ANONYMOUS_KEY**.
+You get these keys when you create a supabase project.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Team Members
+* Aditya Kulkarni - https://github.com/Ad1tya-007
+* Jung-Hyun Andrew Kim - https://github.com/JH-A-Kim
+* Kevin Sugeng - https://github.com/kevinss09
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Conclusion
+This project was done in Stormhacks 2024 V2 (24 hour hackathon).
 
-## Learn More
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
